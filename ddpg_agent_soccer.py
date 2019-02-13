@@ -63,7 +63,7 @@ class Agent():
         self.hard_update(self.actor_target, self.actor_local)
         self.hard_update(self.critic_target, self.critic_local)
     
-    def step(self, state, action, reward, next_state, done, timesteps):
+    def step(self, state, action, reward, next_state, done, timesteps=0):
         """Save experience in replay memory, and use random sample from buffer to learn."""
         # Save experience / reward
         # self.memory.add(state, action, reward, next_state, done)
@@ -74,8 +74,12 @@ class Agent():
         # Learn, if enough samples are available in memory
         # Tried the udacity code for every 20 steps with 10 training, which doesnt scale up
         # It trained up fast if we sample the batch more frequently as below
-        if len(self.memory) > BATCH_SIZE:
-            for _ in range(4):
+#         if len(self.memory) > BATCH_SIZE:
+#             for _ in range(4):
+#                 experiences = self.memory.sample()
+#                 self.learn(experiences, GAMMA)
+        if (len(self.memory) > BATCH_SIZE) and (self.timesteps % 20 == 0):
+            for _ in range(10):
                 experiences = self.memory.sample()
                 self.learn(experiences, GAMMA)
 

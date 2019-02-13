@@ -22,8 +22,8 @@ epsilon=1.0
 epsilon_min=0.01
 epsilon_decay=0.95
 
-# device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-device = torch.device("cpu")
+device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+# device = torch.device("cpu")
 
 class Agent():
     """Interacts with and learns from the environment."""
@@ -63,7 +63,7 @@ class Agent():
         self.hard_update(self.actor_target, self.actor_local)
         self.hard_update(self.critic_target, self.critic_local)
     
-    def step(self, state, action, reward, next_state, done, timesteps):
+    def step(self, state, action, reward, next_state, done, timesteps=0):
         """Save experience in replay memory, and use random sample from buffer to learn."""
         # Save experience / reward
         # self.memory.add(state, action, reward, next_state, done)
