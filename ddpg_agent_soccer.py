@@ -23,7 +23,7 @@ epsilon_min=0.01
 epsilon_decay=0.95
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-print("{} is being used".format(device))
+
 # device = torch.device("cpu")
 
 class Agent():

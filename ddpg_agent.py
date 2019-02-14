@@ -25,6 +25,8 @@ epsilon_decay=0.95
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 # device = torch.device("cpu")
 
+print("{} is being used".format(device))
+
 class Agent():
     """Interacts with and learns from the environment."""
     
