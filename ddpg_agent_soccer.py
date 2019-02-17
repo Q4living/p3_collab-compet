@@ -9,18 +9,18 @@ import torch
 import torch.nn.functional as F
 import torch.optim as optim
 
-BUFFER_SIZE = int(1e5)  # replay buffer size
-BATCH_SIZE = 64         # minibatch size
+BUFFER_SIZE = int(1e5) # replay buffer size
+BATCH_SIZE = 128       # minibatch size
 GAMMA = 0.99            # discount factor
 TAU = 1e-3              # for soft update of target parameters
 LR_ACTOR = 1e-3         # learning rate of the actor 
 LR_CRITIC = 1e-4        # learning rate of the critic
-WEIGHT_DECAY = 0.0     # L2 weight decay
+WEIGHT_DECAY = 0.0      # L2 weight decay
 
 # Additional exploration factor that decay as the agent mature
 epsilon=1.0
 epsilon_min=0.01
-epsilon_decay=0.95
+epsilon_decay=0.99
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
@@ -70,19 +70,19 @@ class Agent():
         # self.memory.add(state, action, reward, next_state, done)
         # Changed to support multi-agents
         for i in range(self.num_agents):
-            self.memory.add(state[i], action[i], reward[i], next_state[i], done[i])
+            self.memory.add(state[i], action[i], reward[i], next_state[i], done)
 
         # Learn, if enough samples are available in memory
         # Tried the udacity code for every 20 steps with 10 training, which doesnt scale up
         # It trained up fast if we sample the batch more frequently as below
-#         if len(self.memory) > BATCH_SIZE:
-#             for _ in range(4):
-#                 experiences = self.memory.sample()
-#                 self.learn(experiences, GAMMA)
-        if (len(self.memory) > BATCH_SIZE) and (self.timesteps % 20 == 0):
-            for _ in range(10):
+        if len(self.memory) > BATCH_SIZE:
+            for _ in range(4):
                 experiences = self.memory.sample()
                 self.learn(experiences, GAMMA)
+#         if (len(self.memory) > BATCH_SIZE) and (self.timesteps % 20 == 0):
+#             for _ in range(10):
+#                 experiences = self.memory.sample()
+#                 self.learn(experiences, GAMMA)
 
     def act(self, state, add_noise=True):
         """Returns actions for given state as per current policy."""
@@ -120,6 +120,9 @@ class Agent():
             gamma (float): discount factor
         """
         states, actions, rewards, next_states, dones = experiences
+        
+        print("g_states:{}, g_actions:{}, g_rewards:{}, g_next_states:{}, done:{}".format(
+                len(states), len(actions), len(rewards), len(next_states), len(dones)))
 
         # ---------------------------- update critic ---------------------------- #
         # Get predicted next-state actions and Q values from target models
@@ -148,7 +151,7 @@ class Agent():
         # ----------------------- update target networks ----------------------- #
         self.soft_update(self.critic_local, self.critic_target, TAU)
         self.soft_update(self.actor_local, self.actor_target, TAU)                     
-
+                    
     def soft_update(self, local_model, target_model, tau):
         """Soft update model parameters.
         θ_target = τ*θ_local + (1 - τ)*θ_target
