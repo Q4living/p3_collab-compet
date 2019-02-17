@@ -19,8 +19,8 @@ WEIGHT_DECAY = 0.0     # L2 weight decay
 
 # Additional exploration factor that decay as the agent mature
 epsilon=1.0
-epsilon_min=0.01
-epsilon_decay=0.95
+epsilon_min=0.001
+epsilon_decay=0.99
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 # device = torch.device("cpu")
@@ -77,7 +77,7 @@ class Agent():
         # Tried the udacity code for every 20 steps with 10 training, which doesnt scale up
         # It trained up fast if we sample the batch more frequently as below
         if len(self.memory) > BATCH_SIZE:
-            for _ in range(4):
+            for _ in range(6):
                 experiences = self.memory.sample()
                 self.learn(experiences, GAMMA)
 
