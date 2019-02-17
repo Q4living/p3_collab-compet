@@ -24,11 +24,11 @@ For each Actor and Critic are coupled with local and target networks
 1. LR_CRITIC = 1e-4 # learning rate for Critic
 1. WEIGHT_DECAY = 0.0 # L2 weight decay, cant not 
 
-With above hyper parameter setting, the agent was able to achieve good performance and reach score 30 in 19 episodes.
+With above hyper parameter setting, the agent was able to achieve good performance and reach average score 0.5 with 100 Consecutive episodes at 228 episodes.
 
 ## Plot of Rewards
 
-![Plot of Rewards](p2_cc_score_plt_01.png)
+![Plot of Rewards](p3_collab_score_plt_03.png)
 
 ## Ideas for Future Work
 The experience replay in the current model is vanila based which should have improved performance if we only include the important experience as not all memory are equally worthy. Furthermore, algorithms of TRPO and PPO should also be implemented and evaluated in the future work to see how the performance would be different or improved.
