@@ -28,7 +28,7 @@ With above hyper parameter setting, the agent was able to achieve good performan
 
 ## Plot of Rewards
 
-![Plot of Rewards](p3_collab_score_plt_04.png)
+![Plot of Rewards](p3_collab_score_plt_03.png)
 
 ## Ideas for Future Work
 The experience replay in the current model is vanila based which should have improved performance if we only include the important experience as not all memory are equally worthy. Furthermore, algorithms of TRPO and PPO should also be implemented and evaluated in the future work to see how the performance would be different or improved.
