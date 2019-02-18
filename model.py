@@ -71,6 +71,7 @@ class Critic(nn.Module):
 
     def forward(self, state, action):
         """Build a critic (value) network that maps (state, action) pairs -> Q-values."""
+        
         state = self.bn(state)
         xs = F.relu(self.fcs1(state))
         x = torch.cat((xs, action), dim=1)

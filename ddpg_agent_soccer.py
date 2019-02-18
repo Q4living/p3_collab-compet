@@ -19,8 +19,8 @@ WEIGHT_DECAY = 0.0      # L2 weight decay
 
 # Additional exploration factor that decay as the agent mature
 epsilon=1.0
-epsilon_min=0.01
-epsilon_decay=0.99
+epsilon_min=0.001
+epsilon_decay=0.999
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
@@ -67,7 +67,9 @@ class Agent():
     def step(self, state, action, reward, next_state, done, timesteps=0):
         """Save experience in replay memory, and use random sample from buffer to learn."""
         # Save experience / reward
-        # self.memory.add(state, action, reward, next_state, done)
+#         print("g_states:{}, g_actions:{}, g_rewards:{}, g_next_states:{}, done:{}".format(
+#                 len(state), len(action), len(reward), len(next_state), done))
+#         self.memory.add(state, action, reward, next_state, done)
         # Changed to support multi-agents
         for i in range(self.num_agents):
             self.memory.add(state[i], action[i], reward[i], next_state[i], done)
@@ -75,32 +77,32 @@ class Agent():
         # Learn, if enough samples are available in memory
         # Tried the udacity code for every 20 steps with 10 training, which doesnt scale up
         # It trained up fast if we sample the batch more frequently as below
-        if len(self.memory) > BATCH_SIZE:
-            for _ in range(4):
-                experiences = self.memory.sample()
-                self.learn(experiences, GAMMA)
-#         if (len(self.memory) > BATCH_SIZE) and (self.timesteps % 20 == 0):
-#             for _ in range(10):
+#         if len(self.memory) > BATCH_SIZE:
+#             for _ in range(4):
 #                 experiences = self.memory.sample()
 #                 self.learn(experiences, GAMMA)
+        if (len(self.memory) > BATCH_SIZE) and (timesteps % 20 == 0):
+            for _ in range(5):
+                experiences = self.memory.sample()
+                self.learn(experiences, GAMMA)
 
-    def act(self, state, add_noise=True):
+    def act(self, state, timesteps=0, add_noise=True):
         """Returns actions for given state as per current policy."""
         states = torch.from_numpy(state).float().to(device)
         self.actor_local.eval()
         with torch.no_grad():
-            actions = np.argmax(self.actor_local(states).cpu().data.numpy(),1)
+            actions = self.actor_local(states).cpu().data.numpy()
         self.actor_local.train()
 
         #add noise according to epsilon probability
         if add_noise and (np.random.random() < self.eps):
 #             actions += self.noise.sample()
-            actions = np.argmax(np.random.random_sample((len(states),self.action_size)),1)
+            actions = np.random.random_sample((len(states),self.action_size))
             #update the exploration parameter
-            self.eps = self.eps * epsilon_decay
-            self.eps = max(self.eps, epsilon_min)
-                
-            self.noise.reset()
+            if timesteps % 100 == 0:
+                self.eps = self.eps * epsilon_decay
+                self.eps = max(self.eps, epsilon_min)
+                self.noise.reset()
 #         return np.clip(actions, -1, 1)
         
         return actions
@@ -120,9 +122,6 @@ class Agent():
             gamma (float): discount factor
         """
         states, actions, rewards, next_states, dones = experiences
-        
-        print("g_states:{}, g_actions:{}, g_rewards:{}, g_next_states:{}, done:{}".format(
-                len(states), len(actions), len(rewards), len(next_states), len(dones)))
 
         # ---------------------------- update critic ---------------------------- #
         # Get predicted next-state actions and Q values from target models
@@ -226,7 +225,7 @@ class ReplayBuffer:
         rewards = torch.from_numpy(np.vstack([e.reward for e in experiences if e is not None])).float().to(device)
         next_states = torch.from_numpy(np.vstack([e.next_state for e in experiences if e is not None])).float().to(device)
         dones = torch.from_numpy(np.vstack([e.done for e in experiences if e is not None]).astype(np.uint8)).float().to(device)
-
+             
         return (states, actions, rewards, next_states, dones)
 
     def __len__(self):
